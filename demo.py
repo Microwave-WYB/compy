@@ -35,5 +35,5 @@ def Counter(initial: int = 0, step: int = 1) -> Composable:
 if __name__ == "__main__":
     hello = Counter(0, 10)
     app = App()
-    app.window().set_content(hello.resolve())
+    app.window().set_content(hello.compose())
     app.run()

@@ -55,21 +55,21 @@ def composes[**P](
 
 @composes(TextWidget)
 def Text(text: Any, *, modifier: ModifierProtocol | None = None) -> dict[str, Any]:
-    return {"text": text, "modifier": modifier}
+    return locals()
 
 
 @composes(RowWidget)
 def Row(*, modifier: ModifierProtocol | None = None) -> dict[str, Any]:
-    return {"modifier": modifier}
+    return locals()
 
 
 @composes(ColumnWidget)
 def Column(*, modifier: ModifierProtocol | None = None) -> dict[str, Any]:
-    return {"modifier": modifier}
+    return locals()
 
 
 @composes(ButtonWidget)
 def Button(
     onclick: Callable[[], None], *, modifier: ModifierProtocol | None = None
 ) -> dict[str, Any]:
-    return {"onclick": onclick, "modifier": modifier}
+    return locals()
