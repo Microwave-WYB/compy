@@ -18,12 +18,12 @@ class Composable:
         self.content = content
         self._instance: Any = None
 
-    def create(self) -> Any:
+    def compose(self) -> Any:
         if self._instance is None:
             self._instance = self.widget.create()
             self.widget.update(self._instance, self.props)
             if self.content:
-                content_instances = [child.create() for child in self.content()]
+                content_instances = [child.compose() for child in self.content()]
                 self.widget.set_content(self._instance, content_instances)
         return self._instance
 
