@@ -18,6 +18,18 @@ class Composable[T]:
         self._props = props
         self.content = content
         self._instance: Any = None
+        self._subscriptions: list[tuple[str, State]] = []
+        self._setup_subscriptions()
+
+    def _setup_subscriptions(self) -> None:
+        for key, value in self._props.items():
+            if isinstance(value, State):
+                resolved_value = value.get()
+                self._props[key] = resolved_value
+                self._subscriptions.append((key, value))
+
+        for key, state in self._subscriptions:
+            state.subscribe(lambda value, k=key: self.recompose({k: value}))
 
     def compose(self) -> T:
         if self._instance is None:
@@ -55,34 +67,13 @@ def composes[**P](
     def decorator(func: Callable[P, dict[str, Any]]) -> Callable[P, Composable]:
         @wraps(func)
         def wrapper(*args: P.args, **kwargs: P.kwargs) -> Composable:
-            # content_func = kwargs.pop("content", None)
             content_func = cast(
                 Callable[[], list[Composable[Any]]] | None, kwargs.pop("content", None)
             )
             props = func(*args, **kwargs)
 
-            # Find State objects in props, resolve to value and setup subscription
-            resolved_props = {}
-            subscriptions = []
-
-            for key, value in props.items():
-                if isinstance(value, State):
-                    resolved_props[key] = value.get()
-                    subscriptions.append((key, value))
-                else:
-                    resolved_props[key] = value
-
             widget = widget_factory.create(widget_class)
-            composable = Composable(widget, resolved_props, content_func)
-
-            # Setup subscriptions
-            def update_prop(key: str, new_value: Any) -> None:
-                composable.recompose({key: new_value})
-
-            for key, state in subscriptions:
-                state.subscribe(lambda value, k=key: update_prop(k, value))
-
-            return composable
+            return Composable(widget, props, content_func)
 
         return cast(Callable[P, Composable], wrapper)
 
@@ -90,7 +81,7 @@ def composes[**P](
 
 
 @composes(TextWidget)
-def Text(text: Any, *, modifier: ModifierProtocol | None = None) -> dict[str, Any]:
+def Text(text: str | State[str], *, modifier: ModifierProtocol | None = None) -> dict[str, Any]:
     return locals()
 
 
