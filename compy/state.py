@@ -38,3 +38,12 @@ def derived[T](compute: Callable[[], T], *dependencies: State) -> State[T]:
         dependency.subscribe(update)
 
     return state
+
+
+def auto_derived[T](compute: Callable[[], T]) -> State[T]:
+    dependencies = [
+        var.cell_contents
+        for var in (compute.__closure__ or [])
+        if isinstance(var.cell_contents, State)
+    ]
+    return derived(compute, *dependencies)

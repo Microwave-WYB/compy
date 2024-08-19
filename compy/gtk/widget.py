@@ -5,7 +5,7 @@ from typing import Any, Callable
 import gi
 
 from compy.modifier import ModifierProtocol
-from compy.state import State
+from compy.state import State, auto_derived
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk  # type: ignore
@@ -28,20 +28,10 @@ class GtkTextWidget(GtkWidget[Gtk.Label]):
         return Gtk.Label()
 
     def update(self, instance: Gtk.Label, props: dict[str, Any]) -> None:
-        def update_label(value: Any) -> None:
-            instance.set_text(str(value))
-
         super().update(instance, props)
         text = props.get("text")
-        if isinstance(text, State):
-            text.subscribe(update_label)
-            instance.set_text(str(text.get()))
-        elif callable(text):
-            for var in text.__closure__ or []:
-                if isinstance(var.cell_contents, State):
-                    var.cell_contents.subscribe(update_label)
-        else:
-            update_label(text)
+        if text:
+            instance.set_text(text)
 
     def set_content(self, instance: Gtk.Label, content: list[Gtk.Widget]) -> None:
         raise ValueError("Text widget cannot set content")
