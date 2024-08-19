@@ -4,7 +4,7 @@ gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk  # type: ignore
 
 
-class App:
+class GtkApp:
     def __init__(self, app_id: str = "com.example.app"):
         self.app = Gtk.Application(application_id=app_id)
         self.windows = []

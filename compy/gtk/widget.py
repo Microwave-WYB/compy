@@ -1,16 +1,57 @@
 """GTK implementations of the Widget class"""
 
-from typing import Any, Callable
+from typing import Any, override
 
 import gi
 
 from compy.modifier import ModifierProtocol
-from compy.state import State, auto_derived
 
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk  # type: ignore
 
 from compy.widget import Widget
+
+
+class ManagedBox(Gtk.Box):
+    """Wrapper around Gtk.Box to provide child management"""
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.children = []
+
+    @override
+    def append(self, child: Gtk.Widget) -> None:
+        """Append a child widget to the box"""
+        self.children.append(child)
+        self.append(child)
+
+    @override
+    def prepend(self, child: Gtk.Widget) -> None:
+        super().prepend(child)
+        self.children.insert(0, child)
+
+    @override
+    def remove(self, child: Gtk.Widget) -> None:
+        """Remove a child widget from the box"""
+        self.children.remove(child)
+        self.remove(child)
+
+    @override
+    def insert_child_after(self, child: Gtk.Widget, sibling: Gtk.Widget | None = None) -> None:
+        super().insert_child_after(child, sibling)
+        self.children.insert(self.children.index(sibling) + 1, child)
+
+    def clear(self) -> None:
+        """Remove all children from the box"""
+        for child in self.children:
+            self.remove(child)
+        self.children.clear()
+
+    def set_children(self, children: list[Gtk.Widget]) -> None:
+        """Set the children of the box"""
+        self.clear()
+        for child in children:
+            self.append(child)
 
 
 class GtkWidget[T: Gtk.Widget](Widget[T]):
