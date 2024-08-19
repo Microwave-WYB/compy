@@ -2,7 +2,7 @@ from compy.composable import Button, Column, Composable, Row, Text
 from compy.gtk import GTK_IMPLEMENTATIONS
 from compy.gtk.core import GtkApp
 from compy.gtk.modifier import Modifier
-from compy.state import MutableState, State, auto_derived
+from compy.state import MutableState, auto_derived
 from compy.widget_factory import widget_factory
 
 widget_factory.load_implementations(GTK_IMPLEMENTATIONS)
@@ -69,5 +69,5 @@ def CounterApp() -> Composable:
 
 if __name__ == "__main__":
     app = GtkApp()
-    app.window().set_content(CounterApp().compose())
+    app.window(title="Counter").set_content(CounterApp().compose())
     app.run()
