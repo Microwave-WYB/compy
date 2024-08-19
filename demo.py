@@ -68,6 +68,8 @@ def CounterApp() -> Composable:
 
 
 if __name__ == "__main__":
-    app = GtkApp()
-    app.window(title="Counter").set_content(CounterApp().compose())
-    app.run()
+    with GtkApp("com.example.app") as app:
+        with app.application_window("Counter App") as window:
+            window(CounterApp())
+
+        app.run()
